@@ -4,8 +4,9 @@
 
 > A digital corkboard to organize your life. Sticky notes that feel real, written in pencil, stuck with logic.
 
-![Project Screenshot](https://via.placeholder.com/800x400?text=Paste+Your+Screenshot+Here)
-*(Replace the link above with a screenshot of your actual app!)*
+<img width="1913" height="902" alt="image" src="https://github.com/user-attachments/assets/185c72fe-ac04-46c7-b486-d12829fd8a27" />
+
+
 
 ## 🌟 Features
 
