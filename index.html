@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sticky Note Todo</title>
     <link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap" rel="stylesheet">
-      <link rel="icon" type="image/png" href="img.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-cork: #e8dcb9; /* Fallback color */
+            --bg-cork: #e8dcb9;
             --paper-yellow: #fffa8a;
             --paper-blue: #a3efff;
             --paper-pink: #ffade3;
@@ -18,11 +18,9 @@
         }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Reenie Beanie', cursive;
             background-color: var(--bg-cork);
-            /* Corkboard texture pattern */
             background-image: radial-gradient(#d4c5a0 15%, transparent 16%),
                               radial-gradient(#d4c5a0 15%, transparent 16%);
             background-size: 20px 20px;
@@ -32,211 +30,183 @@
             overflow-x: hidden;
         }
 
-        /* --- UI Controls --- */
-        .controls {
+        /* --- PRELOADER STYLES (NEW) --- */
+        #preloader {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 50px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-cork);
+            background-image: radial-gradient(#d4c5a0 15%, transparent 16%),
+                              radial-gradient(#d4c5a0 15%, transparent 16%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            z-index: 9999;
             display: flex;
-            gap: 10px;
-            align-items: center;
-            z-index: 100;
-            backdrop-filter: blur(5px);
-            font-family: sans-serif; /* Keep inputs readable */
-        }
-
-        .controls input, .controls textarea {
-            border: none;
-            background: #f0f0f0;
-            padding: 10px 15px;
-            border-radius: 20px;
-            outline: none;
-            font-size: 14px;
-        }
-
-        .controls button {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.1s;
-        }
-
-        .controls button:active {
-            transform: scale(0.95);
-        }
-
-        /* --- The Board --- */
-        #board {
-            padding: 40px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
             justify-content: center;
-            align-items: flex-start;
-            padding-bottom: 100px; /* Space for controls */
+            align-items: center;
+            transition: opacity 0.5s ease-out;
         }
 
-        /* --- Sticky Note Style --- */
-        .note {
-            width: 200px;
-            min-height: 200px;
-            background-color: var(--paper-yellow);
-            padding: 20px;
-            box-shadow: 5px 5px 15px var(--shadow-color);
+        .loader-container {
             position: relative;
-            font-size: 1.5rem;
-            line-height: 1.2;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: grab;
+            text-align: center;
+        }
+
+        .loader-note {
+            width: 150px;
+            height: 150px;
+            background: var(--paper-yellow);
             display: flex;
-            flex-direction: column;
-        }
-
-        /* Hover effect: Lift up */
-        .note:hover {
-            transform: scale(1.05) !important; /* Override inline rotation on hover */
-            box-shadow: 10px 10px 25px rgba(0,0,0,0.3);
-            z-index: 10;
-        }
-
-        /* Tape effect at the top */
-        .note::after {
-            content: '';
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40%;
-            height: 30px;
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 2px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .note h3 {
-            margin: 0 0 10px 0;
+            justify-content: center;
+            align-items: center;
             font-size: 2rem;
-            border-bottom: 1px dashed rgba(0,0,0,0.1);
-            padding-bottom: 5px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            transform: rotate(-5deg);
+            animation: float 2s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
         }
 
-        .note-meta {
-            font-size: 1.1rem;
-            color: #555;
-            margin-bottom: 10px;
-            font-family: sans-serif; /* Readable for dates */
-            font-weight: bold;
-            opacity: 0.6;
+        /* Tape on the loader note */
+        .loader-note::after {
+            content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 20px; background: rgba(255,255,255,0.4);
         }
 
-        .note-body {
-            flex-grow: 1;
-            white-space: pre-wrap; /* Keeps paragraphs */
+        /* Shadow animation */
+        .loader-shadow {
+            width: 100px;
+            height: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 50%;
+            margin: 20px auto 0;
+            animation: shadow-breath 2s ease-in-out infinite;
+            filter: blur(5px);
         }
 
-        /* --- Actions (Done/Delete) --- */
-        .actions {
-            margin-top: 15px;
-            display: flex;
-            justify-content: space-between;
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(-5deg); }
+        }
+
+        @keyframes shadow-breath {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(0.8); opacity: 0.1; }
+        }
+
+        .hide-preloader {
             opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .note:hover .actions {
-            opacity: 1;
-        }
-
-        .btn-action {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-family: 'Reenie Beanie', cursive;
-            font-size: 1.2rem;
-            color: #333;
-            text-decoration: underline;
-        }
-
-        .btn-action:hover {
-            color: #000;
-            font-weight: bold;
-        }
-
-        /* --- States --- */
-        
-        /* Done State: Green checkmark stamp */
-        .note.done {
-            background-color: #e6ffec; /* Slight greenish tint */
-            text-decoration: line-through;
-            color: #888;
-        }
-        
-        .note.done::before {
-            content: 'DONE';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            font-size: 4rem;
-            color: rgba(0, 128, 0, 0.3);
-            border: 3px solid rgba(0, 128, 0, 0.3);
-            padding: 5px 20px;
-            border-radius: 10px;
             pointer-events: none;
         }
 
-        /* Unstick Animation (Falling) */
+        /* --- UI Controls --- */
+        .controls {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9); padding: 10px 20px; border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; gap: 15px; align-items: center;
+            z-index: 100; backdrop-filter: blur(5px); font-family: sans-serif;
+        }
+
+        .controls button {
+            background: #333; color: white; border: none; padding: 10px 20px;
+            border-radius: 20px; cursor: pointer; font-weight: bold; transition: transform 0.1s;
+        }
+        .controls button:active { transform: scale(0.95); }
+
+        /* --- Social Card --- */
+        .social-card {
+            position: fixed; top: 20px; right: 20px; width: 200px; background: #fff;
+            padding: 20px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); transform: rotate(3deg);
+            z-index: 90; text-align: center;
+        }
+        .pin {
+            width: 15px; height: 15px; border-radius: 50%; background-color: #d93636;
+            position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+            box-shadow: 2px 2px 2px rgba(0,0,0,0.3); border: 2px solid #a81c1c;
+        }
+        .social-card h3 { margin: 10px 0; font-size: 1.8rem; border-bottom: 2px solid #eee; }
+        .social-links { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; padding-left: 10px; }
+        .social-links a {
+            text-decoration: none; color: #555; font-size: 1.3rem; font-weight: bold;
+            transition: color 0.2s, transform 0.2s; display: flex; align-items: center; gap: 10px;
+        }
+        .social-links a:hover { color: #000; transform: translateX(5px); }
+        .btn-coffee {
+            background: #FFDD00; color: #000 !important; padding: 5px 10px; border-radius: 5px;
+            margin-top: 5px; width: 100%; justify-content: center; box-sizing: border-box; border: 1px solid #e6c300;
+        }
+
+        /* --- Board & Notes --- */
+        #board {
+            padding: 40px; display: flex; flex-wrap: wrap; gap: 40px;
+            justify-content: center; align-items: flex-start; padding-bottom: 100px; padding-top: 80px;
+        }
+        .note {
+            width: 220px; min-height: 220px; background-color: var(--paper-yellow);
+            padding: 20px; box-shadow: 5px 5px 15px var(--shadow-color); position: relative;
+            font-size: 1.5rem; line-height: 1.2; transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: grab; display: flex; flex-direction: column;
+        }
+        .note:hover { transform: scale(1.05) !important; box-shadow: 10px 10px 25px rgba(0,0,0,0.3); z-index: 10; }
+        .note::after {
+            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 40%; height: 30px; background: rgba(255, 255, 255, 0.4); box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .note h3 { margin: 0 0 10px 0; font-size: 2rem; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 5px; }
+        .note-meta { font-size: 1.1rem; color: #555; margin-bottom: 10px; font-family: sans-serif; font-weight: bold; opacity: 0.6; }
+        .note-body { flex-grow: 1; white-space: pre-wrap; }
+        .actions { margin-top: 15px; display: flex; justify-content: space-between; opacity: 0; transition: opacity 0.2s; }
+        .note:hover .actions { opacity: 1; }
+        .btn-action { background: none; border: none; cursor: pointer; font-family: 'Reenie Beanie', cursive; font-size: 1.2rem; color: #333; text-decoration: underline; }
+        .btn-action:hover { color: #000; font-weight: bold; }
+        .note.done { background-color: #e6ffec; text-decoration: line-through; color: #888; }
+        .note.done::before {
+            content: 'DONE'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 4rem; color: rgba(0, 128, 0, 0.3); border: 3px solid rgba(0, 128, 0, 0.3); padding: 5px 20px; border-radius: 10px; pointer-events: none;
+        }
         @keyframes fall {
             0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            20% { transform: translateY(-20px) rotate(5deg); } /* Slight lift before fall */
+            20% { transform: translateY(-20px) rotate(5deg); }
             100% { transform: translateY(100vh) rotate(45deg); opacity: 0; }
         }
+        .falling { animation: fall 0.8s forwards ease-in; pointer-events: none; }
 
-        .falling {
-            animation: fall 0.8s forwards ease-in;
-            pointer-events: none; /* Prevent clicks while falling */
-        }
-
-        /* Modal for Input */
+        /* Modal */
         #input-modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 200;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 200;
         }
-        
         .modal-paper {
-            background: #fff;
-            padding: 30px;
-            width: 300px;
-            border-radius: 5px;
-            font-family: sans-serif;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            background: #fff; padding: 30px; width: 300px; border-radius: 5px;
+            font-family: sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem;}
-        .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;}
-        
-        .btn-close { background: #ccc; }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;}
     </style>
 </head>
 <body>
 
-    <div id="board">
+    <div id="preloader">
+        <div class="loader-container">
+            <div class="loader-note">
+                Setting up<br>the desk...
+            </div>
+            <div class="loader-shadow"></div>
         </div>
+    </div>
+
+    <div class="social-card">
+        <div class="pin"></div>
+        <h3>Levi Gatimu</h3>
+        <div class="social-links">
+            <a href="https://github.com/leviGatimu" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+            <a href="https://instagram.com/levi.nyk" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+            <a href="https://linkedin.com/in/levi-gatimu" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+            <a href="https://buymeacoffee.com/levi.gatimu" target="_blank" class="btn-coffee"><i class="fas fa-mug-hot"></i> Buy me a coffee</a>
+        </div>
+    </div>
+
+    <div id="board"></div>
 
     <div class="controls">
         <button onclick="openModal()">+ Stick New Note</button>
@@ -246,43 +216,37 @@
     <div id="input-modal">
         <div class="modal-paper">
             <h2>New Task</h2>
-            <div class="form-group">
-                <label>Task</label>
-                <input type="text" id="inp-task" placeholder="e.g. Math Homework">
-            </div>
-            <div class="form-group">
-                <label>Deadline</label>
-                <input type="date" id="inp-deadline">
-            </div>
-            <div class="form-group">
-                <label>Comments</label>
-                <textarea id="inp-comment" rows="3" placeholder="Chapter 4, exercises 1-5"></textarea>
-            </div>
+            <div class="form-group"><label>Task</label><input type="text" id="inp-task" placeholder="e.g. Finish Project"></div>
+            <div class="form-group"><label>Deadline</label><input type="date" id="inp-deadline"></div>
+            <div class="form-group"><label>Comments</label><textarea id="inp-comment" rows="3" placeholder="Details..."></textarea></div>
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button onclick="closeModal()" class="btn-close" style="border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">Cancel</button>
+                <button onclick="closeModal()" style="border:none; background:#ccc; padding:8px 15px; cursor:pointer; border-radius:4px;">Cancel</button>
                 <button onclick="addNote()" style="background:#333; color:#fff; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">Stick It!</button>
             </div>
         </div>
     </div>
 
     <script>
-        // State Management
+        // --- PRELOADER LOGIC (NEW) ---
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            // Wait 1.5 seconds so the animation is visible, then fade out
+            setTimeout(() => {
+                preloader.classList.add('hide-preloader');
+                // Remove from DOM completely after fade out (0.5s)
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }, 1500);
+        });
+
+        // --- EXISTING LOGIC ---
         let notes = JSON.parse(localStorage.getItem('stickyNotes')) || [];
         const board = document.getElementById('board');
-
-        // Initial Render
         renderNotes();
 
-        function saveNotes() {
-            localStorage.setItem('stickyNotes', JSON.stringify(notes));
-        }
-
-        // Generate a random rotation between -5 and 5 degrees for natural look
-        function getRandomRotation() {
-            return Math.floor(Math.random() * 10) - 5;
-        }
-
-        // Generate a random color variant (classic yellow, blue, pink)
+        function saveNotes() { localStorage.setItem('stickyNotes', JSON.stringify(notes)); }
+        function getRandomRotation() { return Math.floor(Math.random() * 10) - 5; }
         function getRandomColor() {
             const colors = ['var(--paper-yellow)', 'var(--paper-blue)', 'var(--paper-pink)'];
             return colors[Math.floor(Math.random() * colors.length)];
@@ -293,16 +257,10 @@
             notes.forEach((note, index) => {
                 const noteEl = document.createElement('div');
                 noteEl.className = `note ${note.done ? 'done' : ''}`;
-                
-                // Set rotation and color
-                // If we haven't saved a rotation/color yet, generate one and save it (optional optimization)
-                // For simplicity, we re-calculate on render or store it. Let's store it to keep it consistent.
                 if(!note.rotation) { note.rotation = getRandomRotation(); }
                 if(!note.color) { note.color = getRandomColor(); }
-
                 noteEl.style.transform = `rotate(${note.rotation}deg)`;
                 noteEl.style.backgroundColor = note.color;
-
                 noteEl.innerHTML = `
                     <h3>${note.task}</h3>
                     ${note.deadline ? `<div class="note-meta">Due: ${note.deadline}</div>` : ''}
@@ -320,74 +278,26 @@
             const task = document.getElementById('inp-task').value;
             const deadline = document.getElementById('inp-deadline').value;
             const comment = document.getElementById('inp-comment').value;
-
-            if (!task) return alert("You need to write a task!");
-
-            const newNote = {
-                task,
-                deadline,
-                comment,
-                done: false,
-                rotation: getRandomRotation(),
-                color: getRandomColor()
-            };
-
-            notes.push(newNote);
-            saveNotes();
-            renderNotes();
-            closeModal();
-            
-            // Clear inputs
+            if (!task) return alert("Write a task first!");
+            notes.push({ task, deadline, comment, done: false, rotation: getRandomRotation(), color: getRandomColor() });
+            saveNotes(); renderNotes(); closeModal();
             document.getElementById('inp-task').value = '';
             document.getElementById('inp-deadline').value = '';
             document.getElementById('inp-comment').value = '';
         }
 
-        function toggleDone(index) {
-            notes[index].done = !notes[index].done;
-            saveNotes();
-            renderNotes();
-        }
-
+        function toggleDone(index) { notes[index].done = !notes[index].done; saveNotes(); renderNotes(); }
+        
         function unstickNote(btnElement, index) {
-            // Find the parent .note element
             const noteEl = btnElement.closest('.note');
-            
-            // Add the falling animation class
             noteEl.classList.add('falling');
-
-            // Wait for animation to finish (0.8s) before removing data
-            setTimeout(() => {
-                notes.splice(index, 1);
-                saveNotes();
-                renderNotes();
-            }, 750);
+            setTimeout(() => { notes.splice(index, 1); saveNotes(); renderNotes(); }, 750);
         }
 
-        function clearAll() {
-            if(confirm("Are you sure you want to clean the whole wall?")) {
-                notes = [];
-                saveNotes();
-                renderNotes();
-            }
-        }
-
-        // Modal Logic
-        function openModal() {
-            document.getElementById('input-modal').style.display = 'flex';
-            document.getElementById('inp-task').focus();
-        }
-        function closeModal() {
-            document.getElementById('input-modal').style.display = 'none';
-        }
-
-        // Close modal if clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('input-modal');
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
+        function clearAll() { if(confirm("Clean the whole wall?")) { notes = []; saveNotes(); renderNotes(); } }
+        function openModal() { document.getElementById('input-modal').style.display = 'flex'; document.getElementById('inp-task').focus(); }
+        function closeModal() { document.getElementById('input-modal').style.display = 'none'; }
+        window.onclick = function(e) { if (e.target == document.getElementById('input-modal')) closeModal(); }
     </script>
 </body>
 </html>
